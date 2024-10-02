@@ -20,7 +20,7 @@ selectElement.on("change", function() {
     tableHeader.append("th")
       .text("Que enfermedad tienes o tuviste?");
     tableHeader.append("th")
-      .text("Fecha de inicio y termino?");
+      .text("Rango de Fecha?");
 
     // Create the table body
     const tableBody = table.append("tbody")
