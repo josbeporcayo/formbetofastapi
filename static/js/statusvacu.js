@@ -31,31 +31,45 @@ selectElement.on("change", function() {
       .attr("class", "btn btn-outline-primary")
       .attr("type", "button")
       .text("Add Row");
+    
+    let contador=1;
     addRowButton.on("click", function() {
-      // Create a new table row
+
+      // Create a new table row with two columns
+      // The first column will be a text input for the disease
+      // The second column will be a date range
       const newRow = tableBody.append("tr");
+
+      // Create a text input for the disease
       newRow.append("td")
         .append("input")
         .attr("type", "text")
-        .attr("class", "form-control");
-      const datecol=newRow.append("td")
-        .append("div")
-        .attr("class", "row")
-        
-        datecol.append("div")
-        .attr("class", "col")
-        .append("input")
-        .attr("type", "date")
         .attr("class", "form-control")
-        .attr("id", "date")
+        .attr("name", `enfermedad${contador}`);
 
-        datecol.append("div")
+      // Create a date range
+      const datecol = newRow.append("td")
+        .append("div")
+        .attr("class", "row");
+
+      // Create a date input for the start date
+      datecol.append("div")
         .attr("class", "col")
         .append("input")
         .attr("type", "date")
         .attr("class", "form-control")
-        .attr("id", "date2")
-        ;
+        .attr("name", `startdate${contador}`);
+
+      // Create a date input for the end date
+      datecol.append("div")
+        .attr("class", "col")
+        .append("input")
+        .attr("type", "date")
+        .attr("class", "form-control")
+        .attr("name", `enddate${contador}`);
+
+      // Increment the counter
+      contador++;
     });
   } else {
     // Hide the table container if no is selected
