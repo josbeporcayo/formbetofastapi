@@ -3,8 +3,25 @@ from pydantic import BaseModel
 from fastapi import FastAPI,Request,Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import create_engine,Table,MetaData,Column,Integer,String,DateTime,Float,JSON
+from sqlalchemy.dialects.sqlite import insert
 
 import pandas as pd
+
+engine=create_engine('sqlite:///data.db')
+
+metadata=MetaData()
+
+paciente=Table('paciente',metadata,
+    Column('id',Integer,primary_key=True,autoincrement=True),
+    Column('firstName',String),
+    Column('lastName',String),
+    Column('dateOfBirth',String),
+    Column('comorbilidades',JSON))
+
+metadata.create_all(engine,checkfirst=True)
+
+
 
 app = FastAPI()
 
@@ -25,32 +42,45 @@ def submit(data: Annotated[FormData, Form()]):
 
     datadict=data.model_dump(mode="json")
 
-    listaenfermedades=[]
-    listastartdate=[]
-    listaenddates=[]
+    enfermedades=[]
+    i=1
+    while True:
+        enfermedad = datadict.get(f"enfermedad{i}")
+        startdate = datadict.get(f"startdate{i}")
+        enddate = datadict.get(f"enddate{i}")
 
-    for key in datadict:
+        # Esto es necesario porque el if con un string "" evalua a False
+        if not enddate:
+            enddate = "now"
 
-        if 'enfermedad' in key:
-            listaenfermedades.append(datadict[key])
+        if enfermedad and startdate and enddate:
+            enfermedades.append({
+                "enfermedad": enfermedad,
+                "startdate": startdate,
+                "enddate": enddate
+            })
+            i += 1
 
-        elif 'startdate' in key:
-            listastartdate.append(datadict[key])
-
-        elif 'enddate' in key:
-            listaenddates.append(datadict[key])
-
+            print("sigo aqui")
         else:
-            continue
-    
-    datadictfinal={'firsname':datadict['firstName'],
-                   'lastname':datadict['lastName'],
-                   'enfermedades':listaenfermedades,
-                   'startdates':listastartdate,
-                   'enddates':listaenddates}
+            break
 
-    datadf=pd.json_normalize(datadictfinal)
+    datadict['comorbilidades']=enfermedades
+    # remove the original enfermedad, startdate, and enddate fields
+    for key in list(datadict.keys()):
+        if key.startswith("enfermedad") or key.startswith("startdate") or key.startswith("enddate"):
+            del datadict[key]
+
+    print(datadict)
+
+    #datadf=pd.json_normalize(datadict)
     
-    datadf.to_csv('data.csv',index=False)
-    return data
+    #datadf.to_csv('data.csv',index=False)
+
+    with engine.connect() as conn:
+        conn.execute(insert(paciente),datadict)
+        conn.commit()
+
+    
+    return datadict
 
