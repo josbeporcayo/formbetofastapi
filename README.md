@@ -1,6 +1,7 @@
 # formbetofastapi
 Este es un ejemplo de un form para beto
 
+![Flow](flow.drawio.png)
 ### Useful Links
 
 * [FastAPI](https://fastapi.tiangolo.com/learn/)
