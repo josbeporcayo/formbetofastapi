@@ -22,6 +22,9 @@ selectElement.on("change", function() {
     tableHeader.append("th")
       .text("Rango de Fecha?");
 
+    tableHeader.append("th")
+      .text("Tuviste complicaciones?");
+
     // Create the table body
     const tableBody = table.append("tbody")
       .attr("id", "table-body");
@@ -68,6 +71,13 @@ selectElement.on("change", function() {
         .attr("class", "form-control")
         .attr("name", `enddate${contador}`);
 
+      // Create a Complications column
+      newRow.append("td")
+        .append("input")
+        .attr("type", "text")
+        .attr("class", "form-control")
+        .attr("name", `complications${contador}`);
+        
       // Increment the counter
       contador++;
     });
